@@ -139,7 +139,7 @@ const findTransitiveDependencies = (
   attributes: string[], 
   candidateKeys: string[][], 
   fds: FunctionalDependency[]
-): FunctionalDependency[] = {
+): FunctionalDependency[] => {
   const transitiveDeps: FunctionalDependency[] = [];
   const primeAttrs = new Set<string>();
   
