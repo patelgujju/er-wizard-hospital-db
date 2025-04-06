@@ -1,4 +1,3 @@
-
 export interface FunctionalDependency {
   determinant: string[]; // Left-hand side attributes
   dependent: string[]; // Right-hand side attributes
@@ -31,11 +30,12 @@ const parseFDs = (fdString: string): FunctionalDependency[] => {
   if (!fdString) return [];
   
   return fdString.split(',').map(fd => {
-    const parts = fd.trim().split('→');
+    // Handle both arrow formats: → and ->
+    const parts = fd.trim().split(/→|->|>/);
     if (parts.length !== 2) return { determinant: [], dependent: [] };
     
-    const determinant = parts[0].trim().split('').filter(char => /[A-Z]/.test(char));
-    const dependent = parts[1].trim().split('').filter(char => /[A-Z]/.test(char));
+    const determinant = parts[0].trim().split('').filter(char => /[A-Z]/i.test(char));
+    const dependent = parts[1].trim().split('').filter(char => /[A-Z]/i.test(char));
     
     return { determinant, dependent };
   }).filter(fd => fd.determinant.length > 0 && fd.dependent.length > 0);
@@ -46,7 +46,7 @@ const parseKeys = (keysString: string): string[][] => {
   if (!keysString) return [];
   
   return keysString.split(',').map(key => 
-    key.trim().split('').filter(char => /[A-Z]/.test(char))
+    key.trim().split('').filter(char => /[A-Z]/i.test(char))
   ).filter(key => key.length > 0);
 };
 
@@ -139,7 +139,7 @@ const findTransitiveDependencies = (
   attributes: string[], 
   candidateKeys: string[][], 
   fds: FunctionalDependency[]
-): FunctionalDependency[] => {
+) => {
   const transitiveDeps: FunctionalDependency[] = [];
   const primeAttrs = new Set<string>();
   
@@ -260,7 +260,7 @@ export const normalize = (
       steps: [{
         name: 'Error',
         relations: [],
-        reasoning: 'No valid functional dependencies provided. Please use the format A→B, BC→D.'
+        reasoning: 'No valid functional dependencies provided. Please use the format A→B, BC→D or A->B, BC->D.'
       }],
       finalRelations: []
     };

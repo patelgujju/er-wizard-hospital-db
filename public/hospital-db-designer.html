@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System DB Designer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>Hospital Management System DB Designer</h1>
+            <nav>
+                <ul>
+                    <li><a href="#entities">Entities</a></li>
+                    <li><a href="#relationships">Relationships</a></li>
+                    <li><a href="#diagrams">ER Diagram</a></li>
+                    <li><a href="#normalization">Normalization</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Hospital Management System DB Designer</h1>
+            <p>A powerful tool for designing and normalizing database schemas for hospital management systems</p>
+        </div>
+    </section>
+
+    <section id="entities" class="section">
+        <div class="container">
+            <h2>Entities and Attributes</h2>
+            <div class="entity-grid">
+                <div class="entity-card">
+                    <h3>Patient</h3>
+                    <ul>
+                        <li><strong>Patient_ID</strong> (int, PK)</li>
+                        <li>Name (string)</li>
+                        <li>Age (int)</li>
+                        <li>Gender (char)</li>
+                        <li>Address (string)</li>
+                        <li>Contact_No (string)</li>
+                    </ul>
+                </div>
+                <div class="entity-card">
+                    <h3>Doctor</h3>
+                    <ul>
+                        <li><strong>Doctor_ID</strong> (int, PK)</li>
+                        <li>Name (string)</li>
+                        <li>Specialization (string)</li>
+                        <li>Department_ID (int, FK)</li>
+                    </ul>
+                </div>
+                <div class="entity-card">
+                    <h3>Appointment</h3>
+                    <ul>
+                        <li><strong>Appointment_ID</strong> (int, PK)</li>
+                        <li>Patient_ID (int, FK)</li>
+                        <li>Doctor_ID (int, FK)</li>
+                        <li>Date (date)</li>
+                        <li>Time (time)</li>
+                        <li>Status (string)</li>
+                    </ul>
+                </div>
+                <div class="entity-card">
+                    <h3>Department</h3>
+                    <ul>
+                        <li><strong>Department_ID</strong> (int, PK)</li>
+                        <li>Name (string)</li>
+                        <li>Location (string)</li>
+                        <li>Head_Doctor_ID (int, FK)</li>
+                    </ul>
+                </div>
+                <div class="entity-card">
+                    <h3>Room</h3>
+                    <ul>
+                        <li><strong>Room_ID</strong> (int, PK)</li>
+                        <li>Room_Type (string)</li>
+                        <li>Floor (int)</li>
+                        <li>Status (string)</li>
+                    </ul>
+                </div>
+                <div class="entity-card">
+                    <h3>Nurse</h3>
+                    <ul>
+                        <li><strong>Nurse_ID</strong> (int, PK)</li>
+                        <li>Name (string)</li>
+                        <li>Department_ID (int, FK)</li>
+                        <li>Shift (string)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="relationships" class="section">
+        <div class="container">
+            <h2>Relationships</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Entity 1</th>
+                            <th>Relationship</th>
+                            <th>Entity 2</th>
+                            <th>Cardinality</th>
+                            <th>Participation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Patient</td>
+                            <td>books</td>
+                            <td>Appointment</td>
+                            <td>1:M</td>
+                            <td>Total</td>
+                        </tr>
+                        <tr>
+                            <td>Doctor</td>
+                            <td>belongs to</td>
+                            <td>Department</td>
+                            <td>M:1</td>
+                            <td>Total</td>
+                        </tr>
+                        <tr>
+                            <td>Room</td>
+                            <td>assigned to</td>
+                            <td>Patient</td>
+                            <td>M:N</td>
+                            <td>Partial</td>
+                        </tr>
+                        <tr>
+                            <td>Nurse</td>
+                            <td>manages</td>
+                            <td>Room</td>
+                            <td>1:M</td>
+                            <td>Partial</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="diagrams" class="section">
+        <div class="container">
+            <h2>ER Diagram</h2>
+            <div class="diagram-container">
+                <h3>Hospital Management System ER Diagram</h3>
+                <div class="diagram-image">
+                    <img src="/lovable-uploads/1cd56e7b-88af-4359-a1cc-b94a60c32953.png" alt="Hospital Management System ER Diagram">
+                </div>
+                <p class="caption">
+                    This diagram depicts the relationships between different entities in the Hospital Management System, 
+                    including patients, doctors, nurses, rooms, and other key components.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="normalization" class="section">
+        <div class="container">
+            <h2>Normalization Tool</h2>
+            <div class="normalization-container">
+                <div class="form-container">
+                    <h3>Input Schema Details</h3>
+                    <form id="normalization-form">
+                        <div class="form-group">
+                            <label for="schema">Relation Schema (e.g., R(A, B, C, D))</label>
+                            <input type="text" id="schema" placeholder="R(A, B, C, D)" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="fds">Functional Dependencies (e.g., A→B, BC→D)</label>
+                            <input type="text" id="fds" placeholder="A→B, BC→D or A->B, BC->D" required>
+                            <p class="input-help">Use the arrow symbol (→) or type '-&gt;'</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="keys">Candidate Keys (optional, e.g., AB, CD)</label>
+                            <input type="text" id="keys" placeholder="AB, CD">
+                        </div>
+                        
+                        <div id="error-message" class="error-message hidden"></div>
+                        
+                        <button type="submit" class="btn primary">Normalize</button>
+                    </form>
+                </div>
+                
+                <div class="results-container">
+                    <div class="results-header">
+                        <h3>Normalization Results</h3>
+                        <button id="copy-btn" class="btn small">Copy</button>
+                    </div>
+                    <div class="results-content" id="results-content">
+                        <div class="results-placeholder">
+                            <p>Enter schema information and click "Normalize"</p>
+                            <p class="small">Results will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Hospital Management System DB Designer</p>
+            <p class="small">A database design tool for healthcare professionals</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

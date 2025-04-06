@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { normalize, NormalizationResult, NormalizationStep } from '../utils/normalizationLogic';
-import { ArrowRight, Copy, CheckCircle } from 'lucide-react';
+import { ArrowRight, Copy, CheckCircle, AlertCircle } from 'lucide-react';
 
 const NormalizationTool = () => {
   const [schema, setSchema] = useState('');
@@ -9,30 +9,42 @@ const NormalizationTool = () => {
   const [candidateKeys, setCandidateKeys] = useState('');
   const [result, setResult] = useState<NormalizationResult | null>(null);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     // Remove any spaces from schema
-    const cleanedSchema = schema.replace(/\s+/g, '');
+    const cleanedSchema = schema.trim();
     
     // Check if schema matches the expected format: R(A,B,C,D)
     const schemaFormat = /^[A-Za-z_]+\([A-Za-z_,\s]+\)$/;
     if (!schemaFormat.test(cleanedSchema)) {
-      alert('Please enter a valid relation schema in the format R(A, B, C, D)');
+      setError('Please enter a valid relation schema in the format R(A, B, C, D)');
       return;
     }
     
-    // Validate functional dependencies
-    const fdFormat = /^([A-Za-z]+→[A-Za-z]+,)*[A-Za-z]+→[A-Za-z]+$/;
-    const cleanedFDs = fds.replace(/\s+/g, '');
-    if (!fdFormat.test(cleanedFDs)) {
-      alert('Please enter valid functional dependencies in the format A→B, BC→D');
+    // Validate functional dependencies - accept both → and -> formats
+    const cleanedFDs = fds.trim();
+    if (!cleanedFDs) {
+      setError('Please enter at least one functional dependency');
       return;
     }
     
-    const normalizationResult = normalize(cleanedSchema, cleanedFDs, candidateKeys);
-    setResult(normalizationResult);
+    try {
+      const normalizationResult = normalize(cleanedSchema, cleanedFDs, candidateKeys);
+      
+      // Check if there was an error in normalization
+      if (normalizationResult.steps.length > 0 && normalizationResult.steps[0].name === 'Error') {
+        setError(normalizationResult.steps[0].reasoning);
+        return;
+      }
+      
+      setResult(normalizationResult);
+    } catch (err) {
+      setError(`Error during normalization: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
   };
 
   const copyResults = () => {
@@ -105,7 +117,7 @@ const NormalizationTool = () => {
                   id="fds"
                   type="text"
                   className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-medical-500"
-                  placeholder="A→B, BC→D"
+                  placeholder="A→B, BC→D or A->B, BC->D"
                   value={fds}
                   onChange={(e) => setFds(e.target.value)}
                   required
@@ -128,6 +140,13 @@ const NormalizationTool = () => {
                   onChange={(e) => setCandidateKeys(e.target.value)}
                 />
               </div>
+              
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-start gap-2">
+                  <AlertCircle className="text-red-500 mt-0.5" size={16} />
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              )}
               
               <button
                 type="submit"
