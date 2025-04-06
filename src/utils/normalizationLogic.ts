@@ -1,3 +1,4 @@
+
 export interface FunctionalDependency {
   determinant: string[]; // Left-hand side attributes
   dependent: string[]; // Right-hand side attributes
@@ -17,7 +18,7 @@ export interface NormalizationResult {
 }
 
 // Parse relation schema string into array of attributes
-const parseSchema = (schema: string): string[] => {
+export const parseSchema = (schema: string): string[] => {
   // Extract attributes from R(A, B, C, D) format
   const match = schema.match(/\(([^)]+)\)/);
   if (!match) return [];
@@ -26,7 +27,7 @@ const parseSchema = (schema: string): string[] => {
 };
 
 // Parse functional dependencies string into structured format
-const parseFDs = (fdString: string): FunctionalDependency[] => {
+export const parseFDs = (fdString: string): FunctionalDependency[] => {
   if (!fdString) return [];
   
   return fdString.split(',').map(fd => {
@@ -79,7 +80,7 @@ const computeClosure = (attrs: string[], fds: FunctionalDependency[]): string[] 
 };
 
 // Find all candidate keys for a relation
-const findCandidateKeys = (
+export const findCandidateKeys = (
   attributes: string[], 
   fds: FunctionalDependency[], 
   providedKeys: string[][] = []

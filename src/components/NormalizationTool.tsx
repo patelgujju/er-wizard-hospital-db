@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
-import { normalize, NormalizationResult, NormalizationStep } from '../utils/normalizationLogic';
-import { ArrowRight, Copy, CheckCircle, AlertCircle } from 'lucide-react';
+import { normalize, NormalizationResult, NormalizationStep, findCandidateKeys, parseSchema, parseFDs } from '../utils/normalizationLogic';
+import { ArrowRight, Copy, CheckCircle, AlertCircle, Key } from 'lucide-react';
 
 const NormalizationTool = () => {
   const [schema, setSchema] = useState('');
   const [fds, setFds] = useState('');
   const [candidateKeys, setCandidateKeys] = useState('');
   const [result, setResult] = useState<NormalizationResult | null>(null);
+  const [autoDetectedKeys, setAutoDetectedKeys] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,6 +34,15 @@ const NormalizationTool = () => {
     }
     
     try {
+      // Auto-detect candidate keys
+      const attributes = parseSchema(cleanedSchema);
+      const parsedFDs = parseFDs(cleanedFDs);
+      
+      if (attributes.length > 0 && parsedFDs.length > 0) {
+        const detectedKeys = findCandidateKeys(attributes, parsedFDs);
+        setAutoDetectedKeys(detectedKeys.map(key => key.join('')));
+      }
+      
       const normalizationResult = normalize(cleanedSchema, cleanedFDs, candidateKeys);
       
       // Check if there was an error in normalization
@@ -139,6 +149,9 @@ const NormalizationTool = () => {
                   value={candidateKeys}
                   onChange={(e) => setCandidateKeys(e.target.value)}
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  If not provided, candidate keys will be automatically detected
+                </p>
               </div>
               
               {error && (
@@ -191,6 +204,23 @@ const NormalizationTool = () => {
                 </div>
               ) : (
                 <div className="space-y-6">
+                  {/* Display candidate keys if available */}
+                  {autoDetectedKeys.length > 0 && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                      <h4 className="text-lg font-medium text-blue-800 mb-2 flex items-center">
+                        <Key className="mr-2" size={18} />
+                        Candidate Keys
+                      </h4>
+                      <p className="bg-white p-2 rounded border border-blue-100 text-blue-900">
+                        {autoDetectedKeys.map((key, index) => (
+                          <span key={key} className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2 mb-2">
+                            {key}
+                          </span>
+                        ))}
+                      </p>
+                    </div>
+                  )}
+
                   {result.steps.map((step, index) => (
                     <StepCard key={index} step={step} index={index + 1} />
                   ))}
